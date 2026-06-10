@@ -1,6 +1,6 @@
 # groceries-agent data repo
 
-This is the **data** for a self-hosted [grocery-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the `groceries-agent-data-template`. It is **private** (it holds every member's personal state) and is read/written by the operator's grocery-mcp Worker via a GitHub App.
+This is the **data** for a self-hosted [groceries-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the [groceries-agent-data-template](https://github.com/caseyWebb/groceries-agent-data-template). It is **private** (it holds every member's personal state) and is read/written by the operator's grocery-mcp Worker via a GitHub App.
 
 ## Layout
 
