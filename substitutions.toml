@@ -1,0 +1,6 @@
+# substitutions.toml — standing substitution rules (shared default; a member may
+# carry a per-user override in users/<username>/substitutions.toml).
+#
+# [[rules]]
+# ingredient = "buttermilk"
+# acceptable_substitutes = ["milk + lemon juice"]

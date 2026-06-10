@@ -1,0 +1,7 @@
+# skus/kroger.toml — shared, location-tagged Kroger SKU cache. Written by the agent
+# at order time; one friend resolving a SKU warms it for everyone.
+#
+# [[mappings]]
+# ingredient = "elbow macaroni"
+# sku = "0001111060933"
+# locationId = "01400943"
