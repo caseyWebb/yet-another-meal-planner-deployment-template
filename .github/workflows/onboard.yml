@@ -1,0 +1,32 @@
+# Onboard a member — mint their invite code + allowlist entry in TENANT_KV. The
+# logic is a reusable workflow in the code repo; this thin caller runs in THIS
+# private repo, so the invite code shown in the run summary is visible only to
+# you. NEVER run onboarding from the public code repo or a fork (its logs are
+# world-readable).
+#
+# Requires on this repo (Settings -> Secrets and variables -> Actions):
+#   Secret:   CLOUDFLARE_API_TOKEN
+#   Variable: TENANT_KV_ID                  (your TENANT_KV namespace id)
+#   Variable: WORKER_NAME or WORKER_HOST    (optional - for the summary connector URL)
+name: Onboard member
+
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: "New member's username (their tenant id + users/<username> subtree)"
+        required: true
+      invite_code:
+        description: "Invite code to mint (leave blank to generate a random one)"
+        required: false
+
+jobs:
+  onboard:
+    uses: caseyWebb/groceries-agent/.github/workflows/data-onboard.yml@main
+    secrets: inherit # passes CLOUDFLARE_API_TOKEN
+    with:
+      username: ${{ inputs.username }}
+      invite_code: ${{ inputs.invite_code }}
+      tenant_kv_id: ${{ vars.TENANT_KV_ID }}
+      worker_name: ${{ vars.WORKER_NAME }}
+      worker_host: ${{ vars.WORKER_HOST }}

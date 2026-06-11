@@ -1,0 +1,20 @@
+# Deploy the grocery-mcp Worker. The deploy logic is a reusable workflow in the
+# code repo (caseyWebb/groceries-agent); this thin caller overlays THIS repo's
+# wrangler.jsonc onto the upstream source and deploys. It runs in this PRIVATE
+# repo with this repo's CLOUDFLARE_API_TOKEN — the public code repo holds no
+# secrets. Pin @main to a release tag if you prefer stability over auto-updates.
+name: Deploy Worker
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: caseyWebb/groceries-agent/.github/workflows/data-deploy.yml@main
+    secrets: inherit # passes CLOUDFLARE_API_TOKEN
+    with:
+      config_path: wrangler.jsonc

@@ -1,0 +1,25 @@
+{
+	// grocery-mcp Worker config — OPERATOR COPY. This file is overlaid onto the
+	// upstream Worker source at deploy time (see .github/workflows/deploy.yml).
+	// Fill in every <...> value; the rest can stay as-is. All non-secret — the
+	// Worker's real secrets (GitHub App key, Kroger creds) are set once via
+	// `wrangler secret put` / the Cloudflare dashboard and persist across deploys.
+	"name": "<your-worker-name>",
+	"main": "src/index.ts",
+	"workers_dev": false,
+	"compatibility_date": "2025-06-01",
+	"compatibility_flags": ["nodejs_compat"],
+	"vars": {
+		"GITHUB_APP_ID": "<app id>",
+		"GITHUB_INSTALLATION_ID": "<installation id>",
+		"DATA_OWNER": "<your github username>",
+		"DATA_REPO": "groceries-agent-data",
+		"DATA_REF": "main"
+	},
+	"kv_namespaces": [
+		{ "binding": "KROGER_KV", "id": "<KROGER_KV id>" },
+		{ "binding": "TENANT_KV", "id": "<TENANT_KV id>" },
+		{ "binding": "OAUTH_KV", "id": "<OAUTH_KV id>" }
+	],
+	"observability": { "enabled": true }
+}
