@@ -9,7 +9,8 @@ You do **not** fork the code repo. This repo is your control plane: deploy, onbo
 ```
 wrangler.jsonc               # YOUR Worker config (overlaid onto the upstream source at deploy)
 recipes/                     # shared recipe content (objective frontmatter + body)
-aliases.toml  ingredients.toml  substitutions.toml   # shared reference data
+aliases.toml  substitutions.toml   # shared reference data
+storage_guidance/            # shared curated put-away advice (class-keyed prose, read-only)
 skus/kroger.toml             # shared, location-tagged SKU cache
 _indexes/                    # generated — do not hand-edit (CI rebuilds it)
 users/
