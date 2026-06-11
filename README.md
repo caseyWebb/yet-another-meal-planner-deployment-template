@@ -16,6 +16,7 @@ users/
   <username>/                # one subtree per member (created lazily on first write)
     pantry.toml  preferences.toml  stockup.toml  grocery_list.toml
     ready_to_eat.toml        # this member's heat-and-eat catalog (per-tenant, not shared)
+    kitchen.toml             # this member's owned cooking equipment (gates recipe makeability)
     taste.md  diet_principles.md  cooking_log.toml  meal_plan.toml  feeds.toml
     overlay.toml             # this member's rating/status per recipe
     notes/                   # this member's recipe notes
