@@ -11,11 +11,11 @@ wrangler.jsonc               # YOUR Worker config (overlaid onto the upstream so
 recipes/                     # shared recipe content (objective frontmatter + body)
 aliases.toml  ingredients.toml  substitutions.toml   # shared reference data
 skus/kroger.toml             # shared, location-tagged SKU cache
-ready_to_eat/*.toml          # shared ready-to-eat catalogs
 _indexes/                    # generated — do not hand-edit (CI rebuilds it)
 users/
   <username>/                # one subtree per member (created lazily on first write)
     pantry.toml  preferences.toml  stockup.toml  grocery_list.toml
+    ready_to_eat.toml        # this member's heat-and-eat catalog (per-tenant, not shared)
     taste.md  diet_principles.md  cooking_log.toml  meal_plan.toml  feeds.toml
     overlay.toml             # this member's rating/status per recipe
     notes/                   # this member's recipe notes

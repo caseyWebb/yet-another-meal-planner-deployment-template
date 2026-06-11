@@ -9,7 +9,6 @@ on:
   push:
     paths:
       - "recipes/**"
-      - "ready_to_eat/**"
   workflow_dispatch:
 
 permissions:
