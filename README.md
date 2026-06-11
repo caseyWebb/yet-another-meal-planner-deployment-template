@@ -29,4 +29,4 @@ Runs are billed to **this repo's owner**, not the code repo's.
 
 ## Onboarding a member
 
-The operator: create `users/<username>/` here (seed from the template stubs), add the member to the Worker's allowlist (`tenant:<username>` in KV), and hand them their invite code + connector URL. They need only a Claude.ai account and a Kroger account — no GitHub account.
+The operator runs the **Onboard member** Action from their [`groceries-agent`](https://github.com/caseyWebb/groceries-agent) fork (Actions tab): in one run it mints the member's invite code, allowlists them in KV, and seeds their `users/<username>/` subtree here. The member needs only a Claude.ai account and a Kroger account — no GitHub account. Full setup: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
