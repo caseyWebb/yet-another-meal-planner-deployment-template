@@ -1,0 +1,16 @@
+# feeds.toml — shared RSS feeds for recipe discovery (data-repo root,
+# user-curated). Discovery is a group-wide concern: any member's feeds contribute
+# to one shared candidate pool (fetch_rss_discoveries), judged against each
+# caller's taste at read time. Add your own feeds below.
+#
+# [[feeds]]
+# url = "https://www.seriouseats.com/recipes/atom.xml"
+# name = "Serious Eats"
+# tags = ["trusted", "technique-focused"]
+# weight = 1.0
+#
+# [[feeds]]
+# url = "https://www.budgetbytes.com/feed/"
+# name = "Budget Bytes"
+# tags = ["weeknight", "approachable"]
+# weight = 0.8

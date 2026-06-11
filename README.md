@@ -12,6 +12,8 @@ recipes/                     # shared recipe content (objective frontmatter + bo
 aliases.toml  substitutions.toml   # shared reference data
 storage_guidance/            # shared curated put-away advice (class-keyed prose, read-only)
 skus/kroger.toml             # shared, location-tagged SKU cache
+feeds.toml  flyer_terms.toml                       # shared discovery feeds + flyer scan terms (curated)
+discovery_sources.toml  discoveries_inbox.toml     # inbound-email allowlist (curated) + forwarded candidates (agent-written)
 _indexes/                    # generated — do not hand-edit (CI rebuilds it)
 users/
   <username>/                # one subtree per member (created lazily on first write)
