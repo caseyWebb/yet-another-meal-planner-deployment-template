@@ -47,6 +47,7 @@ Then fill in `wrangler.jsonc` (worker name, GitHub App id + installation, `DATA_
 | **Revoke member** | manual | remove a member's allowlist entry + invite code |
 | `build-indexes` | auto on recipe changes | regenerate `_indexes/` |
 | `build-site` | auto on recipe changes | build + deploy the public cookbook to GitHub Pages (needs **GitHub Pro**; never reads `users/`) |
+| **Build plugin** | manual | mint a plugin bundle with your Worker URL baked in, as a downloadable artifact to upload to claude.ai (build-only, no secrets) |
 
 The build/deploy/provision **logic** lives in the code repo as reusable workflows; these are thin callers, so updates land centrally. Runs are billed to **this repo's owner**.
 
@@ -54,4 +55,4 @@ The build/deploy/provision **logic** lives in the code repo as reusable workflow
 
 Run the **Onboard member** Action from **this repo's Actions tab** — **not** a fork of the code repo (a fork of a public repo is itself public, so its Actions logs would leak the invite code). Enter the member's `username`; it mints their invite code (shown only in this **private** run's summary) and allowlists them in KV. Their `users/<username>/` subtree is **not** seeded — it's created automatically on their first write (e.g. setting their Kroger store).
 
-Send the member their **invite code** + the **connector URL** (`https://<worker-host>/mcp`) + [`AGENT_INSTRUCTIONS.md`](https://github.com/caseyWebb/groceries-agent/blob/main/AGENT_INSTRUCTIONS.md). They need only a Claude.ai account and a Kroger account — no GitHub account. They add the connector in Claude.ai, enter the code at `/authorize`, then run their Kroger consent at `/oauth/init?tenant=<username>`. Remove someone later with **Revoke member**. Full flow: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
+Then get the agent into their Claude.ai. Easiest: run **Build plugin**, download the `.zip` artifact, and send them that file + their **invite code** — they upload it (Customize → upload a custom plugin file), open a fresh chat, enter the code at `/authorize`, then run Kroger consent at `/oauth/init?tenant=<username>`. No GitHub account needed. (Alternatives: your own marketplace if you forked, or just send the **connector URL** `https://<worker-host>/mcp` + [`AGENT_INSTRUCTIONS.md`](https://github.com/caseyWebb/groceries-agent/blob/main/AGENT_INSTRUCTIONS.md) for a Claude project.) Remove someone later with **Revoke member**. Full flow + the Worker-first update ordering: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
