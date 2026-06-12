@@ -6,8 +6,8 @@
 #
 # Requires on this repo (Settings -> Secrets and variables -> Actions):
 #   Secret:   CLOUDFLARE_API_TOKEN
-#   Variable: TENANT_KV_ID                  (your TENANT_KV namespace id)
 #   Variable: WORKER_NAME or WORKER_HOST    (optional - for the summary connector URL)
+# (TENANT_KV is now addressed by binding from wrangler.jsonc — no TENANT_KV_ID var.)
 name: Onboard member
 
 on:
@@ -27,6 +27,5 @@ jobs:
     with:
       username: ${{ inputs.username }}
       invite_code: ${{ inputs.invite_code }}
-      tenant_kv_id: ${{ vars.TENANT_KV_ID }}
       worker_name: ${{ vars.WORKER_NAME }}
       worker_host: ${{ vars.WORKER_HOST }}

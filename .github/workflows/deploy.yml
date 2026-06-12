@@ -12,9 +12,16 @@ concurrency:
   group: deploy
   cancel-in-progress: false
 
+# contents: write so the deploy can pin auto-provisioned KV ids back into this
+# repo's wrangler.jsonc on first deploy.
+permissions:
+  contents: write
+
 jobs:
   deploy:
     uses: caseyWebb/groceries-agent/.github/workflows/data-deploy.yml@main
-    secrets: inherit # passes CLOUDFLARE_API_TOKEN
+    # inherit passes CLOUDFLARE_API_TOKEN (+ optional KROGER_CLIENT_ID/SECRET, which
+    # the deploy sets as Worker secrets when present).
+    secrets: inherit
     with:
       config_path: wrangler.jsonc
