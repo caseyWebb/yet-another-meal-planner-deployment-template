@@ -36,7 +36,7 @@ In **Settings → Secrets and variables → Actions**:
 - Secrets **`KROGER_CLIENT_ID`** + **`KROGER_CLIENT_SECRET`** (optional) — the deploy sets them as Worker secrets when present.
 - Variable **`WORKER_NAME`** (or **`WORKER_HOST`**) — optional; lets Onboard show the connector URL in its summary.
 
-Then set **`GITHUB_APP_ID`** in `wrangler.jsonc` — that's the only value you fill in. KV ids auto-provision, `DATA_*` is intuited at deploy, and the installation id is resolved at runtime. The App private key goes in the Cloudflare dashboard (never a repo). See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 5–6.
+Then set **`GITHUB_APP_ID`** in `wrangler.jsonc` — that's the only value you fill in. The App private key goes in the Cloudflare dashboard (never a repo). See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 4–5.
 
 ## Workflows — all run from **this repo's** Actions tab
 
