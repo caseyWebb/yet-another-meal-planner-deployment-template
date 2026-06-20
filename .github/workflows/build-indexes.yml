@@ -21,3 +21,4 @@ concurrency:
 jobs:
   build:
     uses: caseyWebb/groceries-agent/.github/workflows/data-build-indexes.yml@main
+    secrets: inherit
