@@ -6,6 +6,7 @@
   "vars": { "GITHUB_APP_ID": "<app id>" },
   // Id-less → auto-provisioned on first deploy and pinned back here.
   "kv_namespaces": [
+    { "binding": "DATA_KV" },
     { "binding": "KROGER_KV" },
     { "binding": "TENANT_KV" },
     { "binding": "OAUTH_KV" }
