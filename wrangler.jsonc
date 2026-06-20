@@ -1,31 +1,13 @@
 {
-	// grocery-mcp Worker config — OPERATOR COPY, overlaid onto the upstream Worker
-	// source at deploy (see .github/workflows/deploy.yml). Zero-config: the ONLY
-	// value you must set is GITHUB_APP_ID. Everything else is a default or handled
-	// for you by the deploy:
-	//   - KV namespaces are AUTO-PROVISIONED (id-less bindings below) on first deploy,
-	//     and their ids pinned back into this file so later deploys reuse them.
-	//   - DATA_OWNER/DATA_REPO are intuited from THIS repo at deploy; DATA_REF=main.
-	//   - GITHUB_INSTALLATION_ID is resolved at runtime by the Worker — omit it.
-	// Secrets (GitHub App private key, Kroger creds) are never in this file: the App
-	// key is set once in the Cloudflare dashboard; Kroger creds can be repo secrets
-	// the deploy puts for you. `name` is per-account, so the default is fine as-is.
-	"name": "grocery-mcp",
-	"main": "src/index.ts",
-	// A *.workers.dev URL out of the box (grocery-mcp.<your-subdomain>.workers.dev) —
-	// the OAuth provider gates the MCP surface, so the raw route is safe. Set false +
-	// add a custom domain/route if you'd rather.
-	"workers_dev": true,
-	"compatibility_date": "2025-06-01",
-	"compatibility_flags": ["nodejs_compat"],
-	"vars": {
-		"GITHUB_APP_ID": "<app id>"
-	},
-	// Id-less → auto-provisioned on first deploy and pinned back here.
-	"kv_namespaces": [
-		{ "binding": "KROGER_KV" },
-		{ "binding": "TENANT_KV" },
-		{ "binding": "OAUTH_KV" }
-	],
-	"observability": { "enabled": true }
+  // Code-level config (main, compatibility_*, triggers, observability) is merged in
+  // from the upstream Worker at deploy — set only your own values here.
+  "name": "grocery-mcp",
+  "workers_dev": true,            // *.workers.dev URL; set false + "routes" for a custom domain
+  "vars": { "GITHUB_APP_ID": "<app id>" },
+  // Id-less → auto-provisioned on first deploy and pinned back here.
+  "kv_namespaces": [
+    { "binding": "KROGER_KV" },
+    { "binding": "TENANT_KV" },
+    { "binding": "OAUTH_KV" }
+  ]
 }
