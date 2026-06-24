@@ -6,9 +6,12 @@
   "vars": { "GITHUB_APP_ID": "<app id>" },
   // Id-less → auto-provisioned on first deploy and pinned back here.
   "kv_namespaces": [
-    { "binding": "DATA_KV" },
     { "binding": "KROGER_KV" },
     { "binding": "TENANT_KV" },
     { "binding": "OAUTH_KV" }
+  ],
+  // Id-less → provisioned on first deploy and pinned back here.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "grocery-mcp", "migrations_dir": "migrations/d1" }
   ]
 }

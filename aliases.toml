@@ -1,5 +1,0 @@
-# aliases.toml — ingredient name normalization (shared). [aliases] maps a variant
-# spelling to a canonical ingredient name.
-#
-# [aliases]
-# "scallion" = "green onion"
