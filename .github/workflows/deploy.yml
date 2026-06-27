@@ -1,8 +1,10 @@
-# Deploy the grocery-mcp Worker. The deploy logic is a reusable workflow in the
-# code repo (caseyWebb/groceries-agent); this thin caller overlays THIS repo's
-# wrangler.jsonc onto the upstream source and deploys. It runs in this PRIVATE
-# repo with this repo's CLOUDFLARE_API_TOKEN — the public code repo holds no
-# secrets. Pin @main to a release tag if you prefer stability over auto-updates.
+# Deploy the grocery-mcp Worker AND publish your plugin marketplace. The deploy
+# logic is a reusable workflow in the code repo (caseyWebb/groceries-agent); this
+# thin caller overlays THIS repo's wrangler.jsonc onto the upstream source, deploys,
+# then builds the plugin with YOUR connector URL baked in and commits it to this
+# repo (your marketplace). It runs in THIS repo with this repo's CLOUDFLARE_API_TOKEN
+# — the public code repo holds no secrets. Pin @main to a release tag if you prefer
+# stability over auto-updates.
 name: Deploy Worker
 
 on:
@@ -12,8 +14,8 @@ concurrency:
   group: deploy
   cancel-in-progress: false
 
-# contents: write so the deploy can pin auto-provisioned KV ids back into this
-# repo's wrangler.jsonc on first deploy.
+# contents: write so the deploy can pin auto-provisioned KV/D1 ids back into this
+# repo's wrangler.jsonc on first deploy AND publish the plugin bundle to this repo.
 permissions:
   contents: write
 
@@ -25,3 +27,6 @@ jobs:
     secrets: inherit
     with:
       config_path: wrangler.jsonc
+      # Your connector host (e.g. grocery-mcp.<you>.workers.dev). The deploy bakes
+      # https://<WORKER_HOST>/mcp into the published plugin and stamps the README badge.
+      worker_host: ${{ vars.WORKER_HOST }}
