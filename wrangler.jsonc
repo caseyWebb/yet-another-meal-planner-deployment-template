@@ -3,7 +3,11 @@
   // from the upstream Worker at deploy — set only your own values here.
   "name": "grocery-mcp",
   "workers_dev": true,            // *.workers.dev URL; set false + "routes" for a custom domain
-  "vars": { "GITHUB_APP_ID": "<app id>" },
+  // Cloudflare Access gate for the /admin panel (optional; unset → /admin 404).
+  "vars": {
+    "ACCESS_TEAM_DOMAIN": "<your-team>.cloudflareaccess.com",
+    "ACCESS_AUD": "<access-app-aud>"
+  },
   // Id-less → auto-provisioned on first deploy and pinned back here.
   "kv_namespaces": [
     { "binding": "KROGER_KV" },

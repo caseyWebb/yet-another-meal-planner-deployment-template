@@ -1,20 +1,14 @@
 # groceries-agent data repo
 
-This is the **data + control plane** for a self-hosted [groceries-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the [groceries-agent-data-template](https://github.com/caseyWebb/groceries-agent-data-template). It holds your `recipes/` + `guidance/` markdown, your `wrangler.jsonc`, and the deploy/build workflows; the operator's grocery-mcp Worker reads and writes the markdown here via a GitHub App. The one Actions secret it carries (`CLOUDFLARE_API_TOKEN`) is an **encrypted** Actions secret — member state never lives here (it's all in D1), and member management is the Worker's Cloudflare Access-gated **`/admin`** panel, so no invite code is ever printed into a CI log.
+This is the **data + control plane** for a self-hosted [groceries-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the [groceries-agent-data-template](https://github.com/caseyWebb/groceries-agent-data-template). It holds your `wrangler.jsonc` and the deploy/build workflows. Your authored corpus — recipes + guidance markdown — lives in a Cloudflare **R2 bucket**, read and written by the operator's grocery-mcp Worker, not in this repo. The one Actions secret it carries (`CLOUDFLARE_API_TOKEN`) is an **encrypted** Actions secret — member state never lives here (it's all in D1), and member management is the Worker's Cloudflare Access-gated **`/admin`** panel, so no invite code is ever printed into a CI log.
 
 You do **not** fork the code repo. This repo is your control plane: the deploy + build workflows run here, as thin callers of *reusable* workflows in the public code repo — so the code repo holds no secrets and you take updates by ref. Full operator setup: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
 
 ## Layout
 
-This repo holds only the **human-authored markdown** — recipes and guidance. Everything operational lives in **Cloudflare D1**.
+This repo holds only your Worker config and the thin deploy/build workflows. Your authored markdown (recipes + guidance) lives in **Cloudflare R2**; everything operational lives in **Cloudflare D1**.
 
 ```
-recipes/                     # shared recipe content (objective YAML frontmatter + markdown body) — starts empty
-guidance/
-  ingredient_storage/        # curated put-away advice (class-keyed prose, read-only)
-  cooking_techniques/        # cooking-technique memories (technique-keyed; agent-writable via save_guidance)
-  purchasing/                # buy-side selection advice (item-keyed; agent-writable via save_guidance)
-_indexes/                    # generated site artifact (components.json) — do not hand-edit; CI rebuilds it
 wrangler.jsonc               # YOUR Worker config (operator-owned keys; merged onto the upstream source at deploy)
 .github/workflows/           # thin callers of the code repo's reusable workflows
 ```
@@ -29,18 +23,16 @@ In **Settings → Secrets and variables → Actions**:
 - Secrets **`KROGER_CLIENT_ID`** + **`KROGER_CLIENT_SECRET`** (optional) — the deploy sets them as Worker secrets when present.
 - Variable **`WORKER_HOST`** (or **`WORKER_NAME`**) — optional; lets the deploy stamp the README health badge and resolve the connector host.
 
-Then set **`GITHUB_APP_ID`** in `wrangler.jsonc` — that's the only value you fill in. The App private key goes in the Cloudflare dashboard (never a repo). KV namespaces and the D1 database ship id-less and auto-provision on first deploy, pinning their ids back into `wrangler.jsonc` (the Deploy workflow has `contents: write` for this). To enable the **`/admin`** panel, add a Cloudflare Access app on `<your-worker-host>/admin` and set `ACCESS_TEAM_DOMAIN` + `ACCESS_AUD` in `wrangler.jsonc` `vars`. See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 4–6.
+KV namespaces and the D1 database ship id-less and auto-provision on first deploy, pinning their ids back into `wrangler.jsonc` (the Deploy workflow has `contents: write` for this); the deploy also ensures the R2 corpus bucket. To enable the **`/admin`** panel, add a Cloudflare Access app on `<your-worker-host>/admin` and set `ACCESS_TEAM_DOMAIN` + `ACCESS_AUD` in `wrangler.jsonc` `vars`. See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 4–6.
 
 ## Workflows — all run from **this repo's** Actions tab
 
 | Workflow | Trigger | Does |
 |---|---|---|
 | **Deploy Worker** | manual | deploy the grocery-mcp Worker (overlays your `wrangler.jsonc` onto the upstream source; auto-provisions KV + D1 and applies migrations) |
-| `build-indexes` | auto on recipe changes | project the D1 `recipes` index from `recipes/` + regenerate `_indexes/` for the static site |
-| `build-site` | auto on recipe changes | build + deploy the public cookbook to GitHub Pages (needs **GitHub Pro**; renders only `recipes/`, never member data) |
 | **Build plugin** | manual | mint a plugin bundle with your Worker URL baked in, as a downloadable artifact to upload to claude.ai (build-only, no secrets) |
 
-The build/deploy/provision **logic** lives in the code repo as reusable workflows; these are thin callers, so updates land centrally. Runs are billed to **this repo's owner**. Member management is **not** a workflow — it's the Worker's `/admin` panel (below).
+The Worker projects the recipe index from the R2 corpus on a schedule and serves the public cookbook at `/cookbook`. The build/deploy/provision **logic** lives in the code repo as reusable workflows; these are thin callers, so updates land centrally. Runs are billed to **this repo's owner**. Member management is **not** a workflow — it's the Worker's `/admin` panel (below).
 
 ## Managing members — the `/admin` panel
 
