@@ -13,6 +13,7 @@ recipes/                     # shared recipe content (objective YAML frontmatter
 guidance/
   ingredient_storage/        # curated put-away advice (class-keyed prose, read-only)
   cooking_techniques/        # cooking-technique memories (technique-keyed; agent-writable via save_guidance)
+  purchasing/                # buy-side selection advice (item-keyed; agent-writable via save_guidance)
 _indexes/                    # generated site artifact (components.json) — do not hand-edit; CI rebuilds it
 wrangler.jsonc               # YOUR Worker config (operator-owned keys; merged onto the upstream source at deploy)
 .github/workflows/           # thin callers of the code repo's reusable workflows
