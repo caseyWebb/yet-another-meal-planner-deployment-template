@@ -3,7 +3,12 @@
   // from the upstream Worker at deploy — set only your own values here.
   "name": "grocery-mcp",
   "workers_dev": true,            // *.workers.dev URL; set false + "routes" for a custom domain
-  "vars": { "GITHUB_APP_ID": "<app id>" },
+  "vars": {
+    "GITHUB_APP_ID": "<app id>",
+    // Optional: enables /health + the README /health.svg status badge. Any random
+    // string — safe to keep in this PRIVATE repo. Omit → the health endpoints stay off.
+    // "HEALTH_TOKEN": "<random string>"
+  },
   // Id-less → auto-provisioned on first deploy and pinned back here.
   "kv_namespaces": [
     { "binding": "KROGER_KV" },

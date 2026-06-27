@@ -1,5 +1,9 @@
 # groceries-agent data repo
 
+<!-- health-badge:start -->
+<!-- The Deploy workflow fills this in with your live status badge once HEALTH_TOKEN (in `wrangler.jsonc` `vars`) and the WORKER_HOST repo variable are set. -->
+<!-- health-badge:end -->
+
 This is the **data + control plane** for a self-hosted [groceries-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the [groceries-agent-data-template](https://github.com/caseyWebb/groceries-agent-data-template). It holds your `recipes/` + `guidance/` markdown, your `wrangler.jsonc`, and the deploy/onboard/revoke workflows; the operator's grocery-mcp Worker reads and writes the markdown here via a GitHub App. It is **private** because it carries your one Actions secret and onboarding prints invite codes into its run logs — *not* because member state lives here (that's all in D1).
 
 You do **not** fork the code repo. This repo is your control plane: deploy, onboarding, and revocation all run here, as thin callers of *reusable* workflows in the public code repo — so the code repo holds no secrets and you take updates by ref. Full operator setup: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
@@ -26,9 +30,11 @@ In **Settings → Secrets and variables → Actions**:
 
 - Secret **`CLOUDFLARE_API_TOKEN`** — a Cloudflare token with Workers + KV + **D1** edit; this is why the repo is private. (D1 edit lets the deploy auto-provision the database and apply its schema migrations.)
 - Secrets **`KROGER_CLIENT_ID`** + **`KROGER_CLIENT_SECRET`** (optional) — the deploy sets them as Worker secrets when present.
-- Variable **`WORKER_NAME`** (or **`WORKER_HOST`**) — optional; lets Onboard show the connector URL in its summary.
+- Variable **`WORKER_NAME`** (or **`WORKER_HOST`**) — optional; lets Onboard show the connector URL in its summary and powers the README health badge.
 
 Then set **`GITHUB_APP_ID`** in `wrangler.jsonc` — that's the only value you fill in. The App private key goes in the Cloudflare dashboard (never a repo). KV namespaces and the D1 database ship id-less and auto-provision on first deploy, pinning their ids back into `wrangler.jsonc` (the Deploy workflow has `contents: write` for this). See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 4–5.
+
+**Optional — health badge.** To show the status badge at the top of this README, add a **`HEALTH_TOKEN`** to `wrangler.jsonc` `vars` (any random string — fine to keep in this private repo) and set the **`WORKER_HOST`** variable. The Deploy workflow renders the Worker's token-gated `/health.svg` card into the badge block above (and always prints the ready-to-paste snippet in its run summary, so you can paste it by hand if the deploy can't write back). It refreshes on a short TTL when the README is viewed — it's a glance, not an alarm; wire a real monitor to `/health` (see [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md)).
 
 ## Workflows — all run from **this repo's** Actions tab
 
