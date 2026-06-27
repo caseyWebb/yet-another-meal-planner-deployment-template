@@ -1,8 +1,8 @@
 # groceries-agent data repo
 
-This is the **data + control plane** for a self-hosted [groceries-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the [groceries-agent-data-template](https://github.com/caseyWebb/groceries-agent-data-template). It holds your `recipes/` + `guidance/` markdown, your `wrangler.jsonc`, and the deploy/onboard/revoke workflows; the operator's grocery-mcp Worker reads and writes the markdown here via a GitHub App. It is **private** because it carries your one Actions secret and onboarding prints invite codes into its run logs — *not* because member state lives here (that's all in D1).
+This is the **data + control plane** for a self-hosted [groceries-agent](https://github.com/caseyWebb/groceries-agent) instance — created from the [groceries-agent-data-template](https://github.com/caseyWebb/groceries-agent-data-template). It holds your `recipes/` + `guidance/` markdown, your `wrangler.jsonc`, and the deploy/build workflows; the operator's grocery-mcp Worker reads and writes the markdown here via a GitHub App. The one Actions secret it carries (`CLOUDFLARE_API_TOKEN`) is an **encrypted** Actions secret — member state never lives here (it's all in D1), and member management is the Worker's Cloudflare Access-gated **`/admin`** panel, so no invite code is ever printed into a CI log.
 
-You do **not** fork the code repo. This repo is your control plane: deploy, onboarding, and revocation all run here, as thin callers of *reusable* workflows in the public code repo — so the code repo holds no secrets and you take updates by ref. Full operator setup: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
+You do **not** fork the code repo. This repo is your control plane: the deploy + build workflows run here, as thin callers of *reusable* workflows in the public code repo — so the code repo holds no secrets and you take updates by ref. Full operator setup: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
 
 ## Layout
 
@@ -25,27 +25,25 @@ wrangler.jsonc               # YOUR Worker config (operator-owned keys; merged o
 
 In **Settings → Secrets and variables → Actions**:
 
-- Secret **`CLOUDFLARE_API_TOKEN`** — a Cloudflare token with Workers + KV + **D1** edit; this is why the repo is private. (D1 edit lets the deploy auto-provision the database and apply its schema migrations.)
+- Secret **`CLOUDFLARE_API_TOKEN`** — a Cloudflare token with Workers + KV + **D1** edit, used by the Deploy workflow. (D1 edit lets the deploy auto-provision the database and apply its schema migrations.)
 - Secrets **`KROGER_CLIENT_ID`** + **`KROGER_CLIENT_SECRET`** (optional) — the deploy sets them as Worker secrets when present.
-- Variable **`WORKER_NAME`** (or **`WORKER_HOST`**) — optional; lets Onboard show the connector URL in its summary.
+- Variable **`WORKER_HOST`** (or **`WORKER_NAME`**) — optional; lets the deploy stamp the README health badge and resolve the connector host.
 
-Then set **`GITHUB_APP_ID`** in `wrangler.jsonc` — that's the only value you fill in. The App private key goes in the Cloudflare dashboard (never a repo). KV namespaces and the D1 database ship id-less and auto-provision on first deploy, pinning their ids back into `wrangler.jsonc` (the Deploy workflow has `contents: write` for this). See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 4–5.
+Then set **`GITHUB_APP_ID`** in `wrangler.jsonc` — that's the only value you fill in. The App private key goes in the Cloudflare dashboard (never a repo). KV namespaces and the D1 database ship id-less and auto-provision on first deploy, pinning their ids back into `wrangler.jsonc` (the Deploy workflow has `contents: write` for this). To enable the **`/admin`** panel, add a Cloudflare Access app on `<your-worker-host>/admin` and set `ACCESS_TEAM_DOMAIN` + `ACCESS_AUD` in `wrangler.jsonc` `vars`. See [SELF_HOSTING](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md) steps 4–6.
 
 ## Workflows — all run from **this repo's** Actions tab
 
 | Workflow | Trigger | Does |
 |---|---|---|
 | **Deploy Worker** | manual | deploy the grocery-mcp Worker (overlays your `wrangler.jsonc` onto the upstream source; auto-provisions KV + D1 and applies migrations) |
-| **Onboard member** | manual | mint a member's invite code + allowlist entry in `TENANT_KV` |
-| **Revoke member** | manual | remove a member's allowlist entry + invite code |
 | `build-indexes` | auto on recipe changes | project the D1 `recipes` index from `recipes/` + regenerate `_indexes/` for the static site |
 | `build-site` | auto on recipe changes | build + deploy the public cookbook to GitHub Pages (needs **GitHub Pro**; renders only `recipes/`, never member data) |
 | **Build plugin** | manual | mint a plugin bundle with your Worker URL baked in, as a downloadable artifact to upload to claude.ai (build-only, no secrets) |
 
-The build/deploy/provision **logic** lives in the code repo as reusable workflows; these are thin callers, so updates land centrally. Runs are billed to **this repo's owner**.
+The build/deploy/provision **logic** lives in the code repo as reusable workflows; these are thin callers, so updates land centrally. Runs are billed to **this repo's owner**. Member management is **not** a workflow — it's the Worker's `/admin` panel (below).
 
-## Onboarding a member
+## Managing members — the `/admin` panel
 
-Run the **Onboard member** Action from **this repo's Actions tab** — **not** a fork of the code repo (a fork of a public repo is itself public, so its Actions logs would leak the invite code). Enter the member's `username`; it mints their invite code (shown only in this **private** run's summary) and allowlists them in `TENANT_KV`. Their per-tenant state is **not** seeded — it's created in D1 automatically on their first write (e.g. setting their Kroger store).
+Onboarding, revocation, and invite rotation live in the Worker's **`/admin`** panel (Cloudflare Access-gated), not a workflow — so minted invite codes never touch a CI log. Open `https://<your-worker-host>/admin`, complete the Access login, and **onboard** the member: enter their `username`; it allowlists them in `TENANT_KV` and shows their invite code **once** plus the connector URL. Their per-tenant state is created in D1 automatically on their first write.
 
-Then get the agent into their Claude.ai. Easiest: run **Build plugin**, download the `.zip` artifact, and send them that file + their **invite code** — they upload it (Customize → upload a custom plugin file), open a fresh chat, enter the code at `/authorize`, then run Kroger consent at `/oauth/init?tenant=<username>`. No GitHub account needed. (Alternatives: your own marketplace if you forked, or just send the **connector URL** `https://<worker-host>/mcp` + [`AGENT_INSTRUCTIONS.md`](https://github.com/caseyWebb/groceries-agent/blob/main/AGENT_INSTRUCTIONS.md) for a Claude project.) Remove someone later with **Revoke member**. Full flow + the Worker-first update ordering: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
+Then get the agent into their Claude.ai. Easiest: run **Build plugin**, download the `.zip` artifact, and send them that file + their **invite code** — they upload it (Customize → upload a custom plugin file), open a fresh chat, enter the code at `/authorize`, then run Kroger consent at `/oauth/init?tenant=<username>`. No GitHub account needed. (Alternatives: your own marketplace if you forked, or just send the **connector URL** `https://<worker-host>/mcp` + [`AGENT_INSTRUCTIONS.md`](https://github.com/caseyWebb/groceries-agent/blob/main/AGENT_INSTRUCTIONS.md) for a Claude project.) To remove or rotate a member, use the same `/admin` panel. Full flow + the Worker-first update ordering: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
