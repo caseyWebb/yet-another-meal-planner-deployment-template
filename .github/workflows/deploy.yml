@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 # contents: write so the deploy can pin auto-provisioned KV ids back into this
-# repo's wrangler.jsonc on first deploy.
+# repo's wrangler.jsonc on first deploy (and stamp the README health badge).
 permissions:
   contents: write
 
@@ -25,3 +25,6 @@ jobs:
     secrets: inherit
     with:
       config_path: wrangler.jsonc
+      # Enables the README health badge (renders /health.svg). Same WORKER_HOST repo
+      # variable the Build plugin workflow uses; blank → the deploy skips the badge.
+      worker_host: ${{ vars.WORKER_HOST }}
