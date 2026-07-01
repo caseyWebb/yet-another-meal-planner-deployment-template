@@ -13,6 +13,7 @@ wrangler.jsonc                   # YOUR Worker config (operator-owned keys; merg
 .github/workflows/deploy.yml     # thin caller of the code repo's reusable deploy workflow
 .claude-plugin/marketplace.json  # your plugin marketplace manifest (-> ./plugin/grocery-agent)
 plugin/grocery-agent/            # the GENERATED plugin bundle — published by the deploy, your URL baked in (do not hand-edit)
+docs/SCRAPER.md                  # operator guide for the optional off-cloud walled-source scraper
 ```
 
 `plugin/grocery-agent/` is created by your **first deploy** (it builds the bundle with your connector URL and commits it here). Until then it doesn't exist — onboard members after your first deploy.
@@ -39,8 +40,16 @@ KV namespaces and the D1 database ship id-less and auto-provision on first deplo
 
 The Worker projects the recipe index from the R2 corpus on a schedule and serves the public cookbook at `/cookbook`. The build/deploy/provision **logic** lives in the code repo as a reusable workflow; this is a thin caller, so updates land centrally. Runs are billed to **this repo's owner**. Member management is **not** a workflow — it's the Worker's `/admin` panel (below).
 
+Every run **rebuilds and republishes the plugin bundle** to this repo's marketplace — even when the only upstream change is personas/skills, e.g. the new **ingest skills** for the [walled-source scraper](#off-cloud-walled-source-scraper) (below). Upstream is now an aube workspace monorepo (`packages/{contract,worker,scraper}`), so its lockfile is **`aube-lock.yaml`** + `pnpm-workspace.yaml` (which replaced `package-lock.json`); this repo carries none of them — you take upstream by ref, not by vendoring it.
+
 ## Managing members — the `/admin` panel
 
 Onboarding, revocation, and invite rotation live in the Worker's **`/admin`** panel (Cloudflare Access-gated), not a workflow — so minted invite codes never touch a CI log. Open `https://<your-worker-host>/admin`, complete the Access login, and **onboard** the member: enter their `username`; it allowlists them in `TENANT_KV` and shows their invite code **once** plus the connector URL. Their per-tenant state is created in D1 automatically on their first write.
 
 Then get the agent into their Claude.ai: send them your **marketplace + their invite code** — `/plugin marketplace add <you>/groceries-agent-data`, then `/plugin install grocery-agent@groceries-agent-data`, then enter the code at `/authorize` and run Kroger consent at `/oauth/init?tenant=<username>`. No GitHub account needed (adding a public marketplace needs no auth), and updates you ship auto-pull. To remove or rotate a member, use the same `/admin` panel. Full flow: [docs/SELF_HOSTING.md](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md).
+
+## Off-cloud walled-source scraper
+
+Some recipe/newsletter sources sit behind a login or paywall the Cloudflare Worker can't reach. Upstream ships an **off-cloud scraper container** — a GHCR image you run on your own box (NAS, home server, occasionally-on laptop). It holds a session you capture for the paid site, pulls new content on a schedule, and pushes it to your Worker's **ingest** endpoint using an **ingest key** you mint in the `/admin` panel under **Config › Ingest Keys**. What it ingests lands in the same R2 corpus + D1 index everything else reads.
+
+It's **optional operator infrastructure**: nothing about it lives in this repo, the Deploy workflow doesn't run it, and members never touch it — they just get the plugin's **ingest skills** in your published bundle. Operator quick-start (mint a key, capture a paid-site session, run the image via `docker run`/`docker-compose`): **[docs/SCRAPER.md](docs/SCRAPER.md)**. Upstream reference: [docs/SELF_HOSTING.md §"Walled-source scraper"](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md#walled-source-scraper) and [packages/scraper/README.md](https://github.com/caseyWebb/groceries-agent/blob/main/packages/scraper/README.md).
