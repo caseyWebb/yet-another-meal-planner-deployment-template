@@ -1,13 +1,13 @@
 {
-  "name": "groceries-agent-data",
+  "name": "yamp",
   "owner": {
-    "name": "grocery-agent operator"
+    "name": "yamp operator"
   },
   "plugins": [
     {
-      "name": "grocery-agent",
-      "source": "./plugin/grocery-agent",
-      "description": "Personal grocery agent — meal planning, pantry, recipes, and Kroger cart. Bundles the workflow skills and the grocery-mcp connector."
+      "name": "yamp",
+      "source": "./plugin/yamp",
+      "description": "Personal yamp — meal planning, pantry, recipes, and Kroger cart. Bundles the workflow skills and the yamp connector."
     }
   ]
 }
