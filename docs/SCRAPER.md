@@ -1,7 +1,7 @@
 # Walled-source scraper (operator guide)
 
 Some recipe and newsletter sources sit behind a login or paywall — a **walled
-source** — that the grocery-mcp Worker can't reach. Cloudflare Workers have no
+source** — that the yamp Worker can't reach. Cloudflare Workers have no
 persistent browser session and can't hold your paid-site cookies, so upstream
 ships a small **off-cloud scraper container** you run on your own machine (a
 NAS, a home server, an occasionally-on laptop). It logs into the walled source
@@ -16,10 +16,10 @@ skills** automatically in your published bundle and drive it from Claude.ai.
 
 This page is the operator quick-start. The authoritative reference is upstream:
 
-- [docs/SELF_HOSTING.md → **"Walled-source scraper"**](https://github.com/caseyWebb/groceries-agent/blob/main/docs/SELF_HOSTING.md#walled-source-scraper)
-- [packages/scraper/README.md](https://github.com/caseyWebb/groceries-agent/blob/main/packages/scraper/README.md) — full container reference
-- [packages/scraper/scraper.example.toml](https://github.com/caseyWebb/groceries-agent/blob/main/packages/scraper/scraper.example.toml) — every config key, documented
-- [packages/scraper/docker-compose.example.yml](https://github.com/caseyWebb/groceries-agent/blob/main/packages/scraper/docker-compose.example.yml) — the exact image tag, environment, and volume paths
+- [docs/SELF_HOSTING.md → **"Walled-source scraper"**](https://github.com/caseyWebb/yet-another-meal-planner/blob/main/docs/SELF_HOSTING.md#walled-source-scraper)
+- [packages/scraper/README.md](https://github.com/caseyWebb/yet-another-meal-planner/blob/main/packages/scraper/README.md) — full container reference
+- [packages/scraper/scraper.example.toml](https://github.com/caseyWebb/yet-another-meal-planner/blob/main/packages/scraper/scraper.example.toml) — every config key, documented
+- [packages/scraper/docker-compose.example.yml](https://github.com/caseyWebb/yet-another-meal-planner/blob/main/packages/scraper/docker-compose.example.yml) — the exact image tag, environment, and volume paths
 
 > The snippets below show the **shape**. Copy the exact GHCR image reference and
 > volume layout from `docker-compose.example.yml` upstream — that file is the
@@ -63,7 +63,7 @@ Start from the upstream example config, then edit it:
 
 ```sh
 mkdir -p scraper-config
-curl -fsSL https://raw.githubusercontent.com/caseyWebb/groceries-agent/main/packages/scraper/scraper.example.toml \
+curl -fsSL https://raw.githubusercontent.com/caseyWebb/yet-another-meal-planner/main/packages/scraper/scraper.example.toml \
   -o scraper-config/scraper.toml
 ```
 
@@ -75,16 +75,16 @@ At minimum, point it at your Worker's ingest URL — your connector host, e.g.
 
 The container is published to GitHub Container Registry. **Confirm the exact tag
 from `docker-compose.example.yml`**; it looks like
-`ghcr.io/caseywebb/groceries-agent/scraper:latest`.
+`ghcr.io/caseywebb/yet-another-meal-planner/scraper:latest`.
 
 ### docker run
 
 ```sh
-docker run -d --name grocery-scraper \
+docker run -d --name yamp-scraper \
   --restart unless-stopped \
   -e INGEST_API_KEY="<paste-the-key-you-minted>" \
   -v "$PWD/scraper-config:/config" \
-  ghcr.io/caseywebb/groceries-agent/scraper:latest
+  ghcr.io/caseywebb/yet-another-meal-planner/scraper:latest
 ```
 
 - `-e INGEST_API_KEY` — the key from **Config › Ingest Keys** (step 1).
@@ -98,7 +98,7 @@ The ready-made compose file already wires the correct image, volumes, and
 environment — download it and just supply your key:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/caseyWebb/groceries-agent/main/packages/scraper/docker-compose.example.yml \
+curl -fsSL https://raw.githubusercontent.com/caseyWebb/yet-another-meal-planner/main/packages/scraper/docker-compose.example.yml \
   -o docker-compose.yml
 ```
 
@@ -108,7 +108,7 @@ file or your shell):
 ```yaml
 services:
   scraper:
-    image: ghcr.io/caseywebb/groceries-agent/scraper:latest
+    image: ghcr.io/caseywebb/yet-another-meal-planner/scraper:latest
     restart: unless-stopped
     environment:
       INGEST_API_KEY: "${INGEST_API_KEY}"

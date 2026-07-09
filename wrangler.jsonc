@@ -1,7 +1,7 @@
 {
   // Code-level config (main, compatibility_*, triggers, observability) is merged in
   // from the upstream Worker at deploy — set only your own values here.
-  "name": "grocery-mcp",
+  "name": "yamp",
   "workers_dev": true,            // *.workers.dev URL; set false + "routes" for a custom domain
   // Cloudflare Access gate for the /admin panel (optional; unset → /admin 404).
   "vars": {
@@ -16,6 +16,6 @@
   ],
   // Id-less → provisioned on first deploy and pinned back here.
   "d1_databases": [
-    { "binding": "DB", "database_name": "grocery-mcp", "migrations_dir": "migrations/d1" }
+    { "binding": "DB", "database_name": "yamp", "migrations_dir": "migrations/d1" }
   ]
 }
